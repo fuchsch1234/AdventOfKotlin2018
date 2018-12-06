@@ -15,7 +15,7 @@ inline fun <reified T> get(): T {
 
 inline fun <reified T> inject(): Delegate<T> {
     val typeName = T::class.qualifiedName ?: T::class.toString()
-    val constructor = Injector.injector.typeRegistry[typeName]
+    val constructor = Injector.typeRegistry[typeName]
     if (constructor != null) {
         val ctor = constructor as ()->T
         return Delegate(ctor)
@@ -33,7 +33,7 @@ class Delegate<T>(private val constructor: ()->T) {
     }
 }
 
-class Injector {
+object Injector {
 
     val typeRegistry = emptyMap<String, ()->Any?>().toMutableMap()
 
@@ -46,7 +46,7 @@ class Injector {
         this.f()
     }
 
-    inner class Binder<T>(private val typeName: String) {
+    class Binder<T>(private val typeName: String) {
         infix fun <R: T> with(f: ()->R) {
             typeRegistry[typeName] = f
         }
