@@ -20,8 +20,11 @@ class UnsatisfiableDependency(what: String) : Exception(what)
 class DelegateProvider<T>(private val typeName: String) {
 
     operator fun provideDelegate(thisref: Any?, property: KProperty<*>): Delegate<T> {
-        val constructor = Injector.typeRegistry[Injector.Key(typeName, property.name)] ?: Injector.typeRegistry[Injector.Key(typeName)]
-        return constructor?.let { Delegate(it as ()->T) } ?: throw UnsatisfiableDependency("Cannot create object of type $typeName")
+        // Try to find constructor for type and property name, or general constructor for type
+        val constructor = Injector.typeRegistry[Injector.Key(typeName, property.name)]
+            ?: Injector.typeRegistry[Injector.Key(typeName)]
+        return constructor?.let { Delegate(it as ()->T) }
+            ?: throw UnsatisfiableDependency("Cannot create object of type $typeName")
     }
 
 }
