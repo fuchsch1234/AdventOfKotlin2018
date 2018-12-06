@@ -100,5 +100,51 @@ class InjectorUnitTests {
             val test = TestClass()
             assertEquals("Injectee3", test.injected.foo())
         }
+
+        @Test
+        fun `Injection works with named variables`() {
+            Injector.providing {
+                bind<String>() with { "Default" }
+                bind<String>("otherStr") with { "Other" }
+            }
+
+            class TestClass {
+                val str: String by inject()
+                val anotherStr: String by inject()
+                val otherStr: String by inject()
+            }
+
+            val test = TestClass()
+            assertEquals("Default", test.str)
+            assertEquals("Default", test.anotherStr)
+            assertEquals("Other", test.otherStr)
+        }
+
+        @Test
+        fun `Rebinding values works`() {
+            Injector.providing {
+                bind<String>() with { "Default" }
+                bind<String>("otherStr") with { "Other" }
+            }
+
+            class TestClass {
+                val str: String by inject()
+                val anotherStr: String by inject()
+                val otherStr: String by inject()
+            }
+
+            val test = TestClass()
+            assertEquals("Default", test.str)
+            assertEquals("Default", test.anotherStr)
+            assertEquals("Other", test.otherStr)
+
+            Injector.providing {
+                bind<String>() with { "Changed" }
+            }
+            val test2 = TestClass()
+            assertEquals("Changed", test2.str)
+            assertEquals("Changed", test2.anotherStr)
+            assertEquals("Other", test2.otherStr)
+        }
     }
 }

@@ -5,7 +5,7 @@ import kotlin.reflect.KProperty
 
 inline fun <reified T> get(): T {
     val typeName = T::class.qualifiedName ?: T::class.toString()
-    val constructor = Injector.typeRegistry[typeName]
+    val constructor = Injector.typeRegistry[Injector.Key(typeName)]
     if (constructor != null) {
         val ctor = constructor as ()->T
         return ctor()
@@ -13,17 +13,21 @@ inline fun <reified T> get(): T {
     throw UnsatisfiableDependency("Cannot create object of type $typeName")
 }
 
-inline fun <reified T> inject(): Delegate<T> {
+inline fun <reified T> inject(): DelegateProvider<T> {
     val typeName = T::class.qualifiedName ?: T::class.toString()
-    val constructor = Injector.typeRegistry[typeName]
-    if (constructor != null) {
-        val ctor = constructor as ()->T
-        return Delegate(ctor)
-    }
-    throw UnsatisfiableDependency("Cannot create object of type $typeName")
+    return DelegateProvider(typeName)
 }
 
 class UnsatisfiableDependency(what: String) : Exception(what)
+
+class DelegateProvider<T>(private val typeName: String) {
+
+    operator fun provideDelegate(thisref: Any?, property: KProperty<*>): Delegate<T> {
+        val constructor = Injector.typeRegistry[Injector.Key(typeName, property.name)] ?: Injector.typeRegistry[Injector.Key(typeName)]
+        return constructor?.let { Delegate(it as ()->T) } ?: throw UnsatisfiableDependency("Cannot create object of type $typeName")
+    }
+
+}
 
 class Delegate<T>(private val constructor: ()->T) {
 
@@ -36,23 +40,24 @@ class Delegate<T>(private val constructor: ()->T) {
 
 object Injector {
 
-    val typeRegistry = emptyMap<String, ()->Any?>().toMutableMap()
+    data class Key(val typeName: String, val varName: String? = null)
 
-    inline fun <reified T> bind(): Binder<T> {
+    val typeRegistry = emptyMap<Key, ()->Any?>().toMutableMap()
+
+    inline fun <reified T> bind(varName: String? = null): Binder<T> {
         val typeName = T::class.qualifiedName ?: T::class.toString()
-        return Binder(typeName)
+        return Binder(Key(typeName, varName))
     }
 
     fun providing(f: Injector.()->Unit) {
         this.f()
     }
 
-    class Binder<T>(private val typeName: String) {
+    class Binder<T>(private val key: Key) {
         infix fun <R: T> with(f: ()->R) {
-            typeRegistry[typeName] = f
+            typeRegistry[key] = f
         }
     }
-
 
 }
 
