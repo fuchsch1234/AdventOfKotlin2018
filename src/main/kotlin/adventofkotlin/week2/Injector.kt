@@ -7,8 +7,8 @@ inline fun <reified T> get(): T {
     val typeName = T::class.qualifiedName ?: T::class.toString()
     val constructor = Injector.injector.typeRegistry[typeName]
     if (constructor != null) {
-        val constructor = constructor as ()->T
-        return constructor()
+        val ctor = constructor as ()->T
+        return ctor()
     }
     throw UnsatisfiableDependency("Cannot create object of type $typeName")
 }
@@ -17,8 +17,8 @@ inline fun <reified T> inject(): Delegate<T> {
     val typeName = T::class.qualifiedName ?: T::class.toString()
     val constructor = Injector.injector.typeRegistry[typeName]
     if (constructor != null) {
-        val constructor = constructor as ()->T
-        return Delegate(constructor)
+        val ctor = constructor as ()->T
+        return Delegate(ctor)
     }
     throw UnsatisfiableDependency("Cannot create object of type $typeName")
 }
