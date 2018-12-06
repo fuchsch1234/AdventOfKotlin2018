@@ -6,11 +6,8 @@ import kotlin.reflect.KProperty
 inline fun <reified T> get(): T {
     val typeName = T::class.qualifiedName ?: T::class.toString()
     val constructor = Injector.typeRegistry[Injector.Key(typeName)]
-    if (constructor != null) {
-        val ctor = constructor as ()->T
-        return ctor()
-    }
-    throw UnsatisfiableDependency("Cannot create object of type $typeName")
+    return constructor?.let { (it as ()->T).invoke() }
+        ?: throw UnsatisfiableDependency("Cannot create object of type $typeName")
 }
 
 inline fun <reified T> inject(): DelegateProvider<T> {
@@ -36,6 +33,7 @@ class Delegate<T>(private val constructor: ()->T) {
     operator fun getValue(thisref: Any?, property: KProperty<*>): T {
         return value
     }
+
 }
 
 object Injector {
