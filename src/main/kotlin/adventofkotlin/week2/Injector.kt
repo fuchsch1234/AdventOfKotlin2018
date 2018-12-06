@@ -27,7 +27,8 @@ class UnsatisfiableDependency(what: String) : Exception(what)
 
 class Delegate<T>(private val constructor: ()->T) {
 
-    val value: T by lazy { constructor() }
+    private val value: T by lazy { constructor() }
+
     operator fun getValue(thisref: Any?, property: KProperty<*>): T {
         return value
     }
