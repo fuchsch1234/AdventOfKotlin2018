@@ -26,7 +26,7 @@ class InjectorUnitTests {
     inner class GetUnitTests {
         @Test
         fun `Simple injection works`() {
-            Injector.module {
+            Injector.providing {
                 bind<Injectee1>() with { Injectee1() }
             }
 
@@ -40,7 +40,7 @@ class InjectorUnitTests {
 
         @Test
         fun `Multiple injection works`() {
-            Injector.module {
+            Injector.providing {
                 bind<Injectee1>() with { Injectee1() }
                 bind<Injectee2>() with { Injectee2() }
             }
@@ -57,7 +57,7 @@ class InjectorUnitTests {
 
         @Test
         fun `Interface injection works`() {
-            Injector.module {
+            Injector.providing {
                 bind<I1>() with { Injectee3() }
                 // Doesn't work because Injectee1 is not a subtype of I1
 //                bind<I1>() with { Injectee1() }
@@ -75,7 +75,7 @@ class InjectorUnitTests {
     inner class InjectUnitTests {
         @Test
         fun `Simple lazy injection works`() {
-            Injector.module {
+            Injector.providing {
                 bind<Injectee1>() with { Injectee1() }
             }
 
@@ -89,7 +89,7 @@ class InjectorUnitTests {
 
         @Test
         fun `Lazy interface injection works`() {
-            Injector.module {
+            Injector.providing {
                 bind<I1>() with { Injectee3() }
             }
 

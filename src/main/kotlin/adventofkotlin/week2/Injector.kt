@@ -5,7 +5,7 @@ import kotlin.reflect.KProperty
 
 inline fun <reified T> get(): T {
     val typeName = T::class.qualifiedName ?: T::class.toString()
-    val constructor = Injector.injector.typeRegistry[typeName]
+    val constructor = Injector.typeRegistry[typeName]
     if (constructor != null) {
         val ctor = constructor as ()->T
         return ctor()
@@ -42,13 +42,8 @@ class Injector {
         return Binder(typeName)
     }
 
-    companion object {
-        val injector = Injector()
-
-        fun module(f: Injector.()->Unit) {
-            f(injector)
-        }
-
+    fun providing(f: Injector.()->Unit) {
+        this.f()
     }
 
     inner class Binder<T>(private val typeName: String) {
