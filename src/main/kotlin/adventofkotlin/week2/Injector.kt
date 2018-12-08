@@ -56,6 +56,10 @@ object Injector {
         this.f()
     }
 
+    fun reset() {
+        typeRegistry.clear()
+    }
+
     class Binder<T>(private val key: Key) {
         infix fun <R: T> with(f: ()->R) {
             typeRegistry[key] = f

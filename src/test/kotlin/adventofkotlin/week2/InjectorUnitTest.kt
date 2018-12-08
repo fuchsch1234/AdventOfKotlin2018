@@ -3,6 +3,7 @@ package adventofkotlin.week2
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 
 interface I1 {
     fun foo(): String
@@ -25,6 +26,11 @@ class Injectee4 {
 }
 
 class InjectorUnitTests {
+
+    @BeforeEach
+    fun SetUp() {
+        Injector.reset()
+    }
 
     @Nested
     inner class GetUnitTests {
