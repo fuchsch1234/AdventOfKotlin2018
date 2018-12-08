@@ -170,4 +170,28 @@ class InjectorUnitTests {
             assertEquals("Other", test2.otherStr)
         }
     }
+
+    @Nested
+    inner class MixedInjectAndGetUnitTests {
+        @Test
+        fun `Mixing inject and get works`() {
+            Injector.providing {
+                bind<Injectee1>() with { Injectee1() }
+                bind<String>() with { "Default" }
+                bind<I1>() with { Injectee3() }
+            }
+            class TestClass {
+                val injectee1: Injectee1 = get()
+                val str: String = get()
+                val otherStr: String by inject()
+                val i1: I1 by inject()
+            }
+
+            val test = TestClass()
+            assertEquals(5, test.injectee1.test)
+            assertEquals("Default", test.otherStr)
+            assertEquals("Default", test.str)
+            assertEquals("Injectee3", test.i1.foo())
+        }
+    }
 }
