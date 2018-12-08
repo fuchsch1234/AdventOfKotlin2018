@@ -20,6 +20,10 @@ class Injectee3 : I1 {
     override fun foo(): String = "Injectee3"
 }
 
+class Injectee4 {
+    val i2: Injectee2 = get()
+}
+
 class InjectorUnitTests {
 
     @Nested
@@ -68,6 +72,19 @@ class InjectorUnitTests {
 
             val test = TestClass()
             assertEquals("Injectee3", test.injected.foo())
+        }
+
+        @Test
+        fun `Transitive injection works`() {
+            Injector.providing {
+                bind<Injectee2>() with { Injectee2() }
+                bind<Injectee4>() with { Injectee4() }
+            }
+            class TestClass {
+                val injected: Injectee4 = get()
+            }
+            val test = TestClass()
+            assertEquals(6, test.injected.i2.test)
         }
     }
 
