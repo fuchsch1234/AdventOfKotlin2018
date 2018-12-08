@@ -3,6 +3,7 @@ package adventofkotlin.week2
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 
 interface I1 {
@@ -49,10 +50,9 @@ class InjectorUnitTests {
         }
 
         @Test
-        fun `Multiple injection works`() {
+        fun `Throwing if provider is missing works`() {
             Injector.providing {
                 bind<Injectee1>() with { Injectee1() }
-                bind<Injectee2>() with { Injectee2() }
             }
 
             class TestClass {
@@ -60,9 +60,7 @@ class InjectorUnitTests {
                 val injected2: Injectee2 = get()
             }
 
-            val test = TestClass()
-            assertEquals(5, test.injected1.test)
-            assertEquals(6, test.injected2.test)
+            assertThrows(UnsatisfiableDependency::class.java) { TestClass() }
         }
 
         @Test
@@ -91,6 +89,16 @@ class InjectorUnitTests {
             }
             val test = TestClass()
             assertEquals(6, test.injected.i2.test)
+        }
+
+        @Test
+        fun `getOrNull does not throw`() {
+            class TestClass {
+                val injected: Injectee1? = getOrNull()
+            }
+
+            val test = TestClass()
+            assertEquals(null, test.injected)
         }
     }
 

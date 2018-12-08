@@ -10,6 +10,12 @@ inline fun <reified T> get(): T {
         ?: throw UnsatisfiableDependency("Cannot create object of type $typeName")
 }
 
+inline fun <reified T: Any> getOrNull(): T? {
+    val typeName = T::class.qualifiedName ?: T::class.toString()
+    val constructor = Injector.getConstructor<T>(Injector.Key(typeName))
+    return constructor?.invoke()
+}
+
 inline fun <reified T> inject(): DelegateProvider<T> {
     val typeName = T::class.qualifiedName ?: T::class.toString()
     return DelegateProvider(typeName)
