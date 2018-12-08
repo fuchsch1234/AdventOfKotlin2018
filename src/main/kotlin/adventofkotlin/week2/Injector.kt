@@ -39,6 +39,20 @@ class Delegate<T>(private val constructor: ()->T) {
 
 }
 
+class Singleton<T>(private val constructor: () -> T) : () -> T {
+
+    private val value: T by lazy { constructor() }
+
+    override operator fun invoke(): T = value
+
+}
+
+class Factory<T>(private val constructor: () -> T) : () -> T {
+
+    override operator fun invoke(): T = constructor()
+
+}
+
 object Injector {
 
     data class Key(val typeName: String, val varName: String? = null)

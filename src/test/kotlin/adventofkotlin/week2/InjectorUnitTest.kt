@@ -194,4 +194,28 @@ class InjectorUnitTests {
             assertEquals("Injectee3", test.i1.foo())
         }
     }
+    @Nested
+    inner class FactoriesUnitTests {
+        @Test
+        fun `Factory and Singleton works`() {
+            Injector.providing {
+                bind<Injectee1>() with Factory { Injectee1() }
+                bind<I1>() with Singleton { Injectee3() }
+            }
+            class TestClass {
+                val injectee1: Injectee1 = get()
+                val injectee2: Injectee1 = get()
+                val i1: I1 by inject()
+                val i2: I1 by inject()
+            }
+
+            val test = TestClass()
+            assertEquals(5, test.injectee1.test)
+            assertEquals(5, test.injectee2.test)
+            assert(test.injectee1 !== test.injectee2)
+            assertEquals("Injectee3", test.i1.foo())
+            assertEquals("Injectee3", test.i2.foo())
+            assert(test.i1 === test.i2)
+        }
+    }
 }
