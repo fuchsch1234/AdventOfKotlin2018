@@ -3,6 +3,7 @@ package adventofkotlin.week2
 import java.lang.Exception
 import kotlin.reflect.KProperty
 
+@Suppress("UNCHECKED_CAST")
 inline fun <reified T> get(): T {
     val typeName = T::class.qualifiedName ?: T::class.toString()
     val constructor = Injector.typeRegistry[Injector.Key(typeName)]
@@ -19,6 +20,7 @@ class UnsatisfiableDependency(what: String) : Exception(what)
 
 class DelegateProvider<T>(private val typeName: String) {
 
+    @Suppress("UNCHECKED_CAST")
     operator fun provideDelegate(thisref: Any?, property: KProperty<*>): Delegate<T> {
         // Try to find constructor for type and property name, or general constructor for type
         val constructor = Injector.typeRegistry[Injector.Key(typeName, property.name)]
