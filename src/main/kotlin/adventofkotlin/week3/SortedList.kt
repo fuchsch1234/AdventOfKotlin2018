@@ -51,14 +51,9 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
     private fun treeAdd(tree: Tree<T>, element: T): Tree<T> = when(tree) {
         is Node -> {
             when (comparator.compare(element, tree.value)) {
-                0 -> {
-                    if (tree.value == element) {
-                        tree
-                    } else {
-                        Node(tree.value, treeAdd(tree.left, element), tree.right)
-                    }
-                }
-                in Int.MIN_VALUE..-1 -> Node(tree.value, treeAdd(tree.left, element), tree.right)
+                // Element compares smaller or equal to value in current node, add to left subtree.
+                in Int.MIN_VALUE..0 -> Node(tree.value, treeAdd(tree.left, element), tree.right)
+                // Element compares bigger to value in current node, add to right subtree.
                 else -> Node(tree.value, tree.left, treeAdd(tree.right, element))
             }
         }
