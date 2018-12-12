@@ -116,10 +116,10 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
         private val nodeStack = Stack<Node<T>>()
 
         init {
-            var tree = tree
-            while (tree is Node) {
-                nodeStack.push(tree)
-                tree = tree.left
+            var node = tree
+            while (node is Node) {
+                nodeStack.push(node)
+                node = node.left
             }
         }
 
