@@ -31,7 +31,7 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
 
     override fun iterator(): Iterator<T> = TreeIterator(root)
 
-    private fun treeContains(tree: Tree<T>, element: T): Boolean = when(tree) {
+    private tailrec fun treeContains(tree: Tree<T>, element: T): Boolean = when(tree) {
         is Node -> {
             when (comparator.compare(element, tree.value)) {
                 0 -> {
