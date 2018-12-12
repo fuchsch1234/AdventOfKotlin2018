@@ -64,7 +64,7 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
         }
 
         fun <T: Comparable<T>> fromList(vararg elements: T): TreeList<T>
-                = fromList(Comparator{ a, b -> a.compareTo(b)}, *elements)
+                = fromList(compareBy { it }, *elements)
     }
 
     inner class TreeIterator<T>(tree: Tree<T>): Iterator<T> {
