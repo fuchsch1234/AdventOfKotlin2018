@@ -29,9 +29,7 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
 
     override fun contains(element: T): Boolean = treeContains(root, element)
 
-    override fun iterator(): Iterator<T> {
-        TODO("not implemented")
-    }
+    override fun iterator(): Iterator<T> = TreeIterator(root)
 
     private fun treeContains(tree: Tree<T>, element: T): Boolean = when(tree) {
         is Node -> {
@@ -67,6 +65,32 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
 
         fun <T: Comparable<T>> fromList(vararg elements: T): TreeList<T>
                 = fromList(Comparator{ a, b -> a.compareTo(b)}, *elements)
+    }
+
+    inner class TreeIterator<T>(tree: Tree<T>): Iterator<T> {
+
+        private val nodeStack = Stack<Node<T>>()
+
+        init {
+            var tree = tree
+            while (tree is Node) {
+                nodeStack.push(tree)
+                tree = tree.left
+            }
+        }
+
+        override fun hasNext(): Boolean = !nodeStack.empty()
+
+        override fun next(): T {
+            val next = nodeStack.pop()
+            var tree: Tree<T> = next.right
+            while (tree is Node) {
+                nodeStack.push(tree)
+                tree = tree.left
+            }
+            return next.value
+        }
+
     }
 
 }
