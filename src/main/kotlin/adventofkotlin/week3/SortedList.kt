@@ -22,7 +22,7 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
     }
 
     override fun remove(element: T) {
-        TODO("not implemented")
+        root = treeRemove(root, element)
     }
 
     override fun get(index: Int): T = this.drop(index).first()
@@ -63,6 +63,38 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
             }
         }
         is Empty -> Node(element, Empty(), Empty())
+    }
+
+    private fun treeRemove(tree: Tree<T>, element: T): Tree<T> = when(tree) {
+        is Node -> {
+            when (comparator.compare(element, tree.value)) {
+                0 -> {
+                    if (tree.value == element) {
+                        when  {
+                            tree.left is Empty -> tree.right
+                            tree.right is Empty -> tree.left
+                            else -> {
+                                val (head, rest) = extractLeftMostNode(tree.right as Node)
+                                Node(head.value, tree.left, rest)
+                            }
+                        }
+                    } else {
+                        Node(tree.value, treeRemove(tree.left, element), tree.right)
+                    }
+                }
+                in Int.MIN_VALUE..-1 -> Node(tree.value, treeRemove(tree.left, element), tree.right)
+                else -> Node(tree.value, tree.left, treeRemove(tree.right, element))
+            }
+        }
+        is Empty -> Empty()
+    }
+
+    private fun extractLeftMostNode(tree: Node<T>): Pair<Node<T>, Tree<T>> = when(tree.left) {
+        is Node -> {
+            val (head, rest) = extractLeftMostNode(tree.left)
+            Pair(head, Node(tree.value, rest, tree.right))
+        }
+        is Empty -> Pair(tree, tree.right)
     }
 
     companion object {
