@@ -13,7 +13,7 @@ interface SortedMutableList<T> : Iterable<T> {
 
 class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> {
     override val size: Int
-        get() = TODO("not implemented")
+        get() = this.count()
 
     private var root: Tree<T> = Empty()
 
