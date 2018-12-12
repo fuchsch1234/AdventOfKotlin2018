@@ -34,7 +34,13 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
     private fun treeContains(tree: Tree<T>, element: T): Boolean = when(tree) {
         is Node -> {
             when (comparator.compare(element, tree.value)) {
-                0 -> tree.value == element
+                0 -> {
+                    if (tree.value == element) {
+                        true
+                    } else {
+                        treeContains(tree.left, element)
+                    }
+                }
                 in Int.MIN_VALUE..-1 -> treeContains(tree.left, element)
                 else -> treeContains(tree.right, element)
             }
@@ -45,7 +51,13 @@ class TreeList<T>(private val comparator: Comparator<T>) : SortedMutableList<T> 
     private fun treeAdd(tree: Tree<T>, element: T): Tree<T> = when(tree) {
         is Node -> {
             when (comparator.compare(element, tree.value)) {
-                0 -> tree
+                0 -> {
+                    if (tree.value == element) {
+                        tree
+                    } else {
+                        Node(tree.value, treeAdd(tree.left, element), tree.right)
+                    }
+                }
                 in Int.MIN_VALUE..-1 -> Node(tree.value, treeAdd(tree.left, element), tree.right)
                 else -> Node(tree.value, tree.left, treeAdd(tree.right, element))
             }
