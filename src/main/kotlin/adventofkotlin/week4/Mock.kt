@@ -6,6 +6,8 @@ import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
+typealias MockBody = () -> Any
+
 /**
  * Convenience function to set a singleton return value for a mocked method.
  *
@@ -39,7 +41,7 @@ fun <T, R: T> setReturnValue(func: () -> T, ret: R) = setBody(func, { ret })
 @Suppress("UNCHECKED_CAST")
 fun <T, R: T> setBody(func: () -> T, body: () -> R) {
     val key = func.javaClass.name
-    Mock.bindingHelper[key] = body as () -> Any
+    Mock.bindingHelper[key] = body as MockBody
     // Call lambda to associate body with mocked method.
     func()
     // Remove binding to avoid checking it again and again in mock.invoke().
@@ -63,7 +65,7 @@ inline fun <reified T> mock(): T {
  */
 class Mock: InvocationHandler {
 
-    var bindings: MutableMap<Method, ()->Any> = mutableMapOf()
+    var bindings: MutableMap<Method, MockBody> = mutableMapOf()
 
     /**
      * Handles a method calls for a proxy object.
@@ -99,7 +101,7 @@ class Mock: InvocationHandler {
         /**
          * Stores all bodies which are currently in process of binding to a mocked method.
          */
-        var bindingHelper: MutableMap<String, () -> Any> = mutableMapOf()
+        var bindingHelper: MutableMap<String, MockBody> = mutableMapOf()
     }
 
 }
