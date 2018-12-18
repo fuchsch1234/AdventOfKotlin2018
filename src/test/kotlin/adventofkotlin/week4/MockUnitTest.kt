@@ -1,6 +1,5 @@
 package adventofkotlin.week4
 
-import jdk.internal.vm.compiler.word.LocationIdentity.any
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -24,9 +23,7 @@ class MockUnitTest {
     fun `setBody is executed on call`() {
         var i = 1
         val b = mock<Example>()
-        setBody(
-            { b.getInt() },
-            { i++ })
+        setBody( { b.getInt() }, { i++ })
         assertEquals(1, b.getInt())
         assertEquals(2, b.getInt())
         assertEquals(3, b.getInt())
