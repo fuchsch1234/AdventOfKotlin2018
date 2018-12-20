@@ -65,7 +65,7 @@ inline fun <reified T> mock(): T {
  */
 class Mock: InvocationHandler {
 
-    var bindings: MutableMap<Method, MockBody> = mutableMapOf()
+    private val bindings: MutableMap<Method, MockBody> = mutableMapOf()
 
     /**
      * Handles a method calls for a proxy object.
