@@ -43,9 +43,13 @@ fun <T, R: T> setBody(func: () -> T, body: () -> R) {
     val key = func.javaClass.name
     Mock.bindingHelper[key] = body as MockBody
     // Call lambda to associate body with mocked method.
-    func()
-    // Remove binding to avoid checking it again and again in mock.invoke().
-    Mock.bindingHelper.remove(key)
+    try {
+        func()
+    } catch (t: Throwable) {
+    } finally {
+        // Remove binding to avoid checking it again and again in mock.invoke().
+        Mock.bindingHelper.remove(key)
+    }
 }
 
 /**
@@ -89,7 +93,7 @@ class Mock: InvocationHandler {
                 // Should never fail, because key was checked before using containsKey()
                 bindings[method] = bindingHelper[key] ?: throw IllegalArgumentException("Missing body for $key")
                 // Bail out early to avoid calling the function body.
-                return 0
+                throw Throwable()
             }
         }
         return bindings[method]?.invoke() ?: throw IllegalStateException("No body for mocked method $method set")
