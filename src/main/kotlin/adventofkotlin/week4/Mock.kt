@@ -13,21 +13,17 @@ typealias MockBody = (List<Any>) -> Any
  *
  * This function expects its first argument to be a lambda
  * calling a single method of a mock object created with mock().
- * The upper type bound for the return values type ensures
- * the signature matches the expected value for this method.
  *
  * @param func A lambda calling a method of a mock object.
  * @param ret The return value all calls to this method should return.
  */
-fun <T, R: T> setReturnValue(func: () -> T, ret: R) = setBody(func, { ret })
+fun <T> setReturnValue(func: () -> T, ret: T) = setBody(func, { ret })
 
 /**
  * Sets a body for a mocked method.
  *
  * This function expects its first argument to be a lambda
  * calling a single method of a mock object created with mock().
- * The upper type bound for the second lambdas return type ensures
- * the signature matches the expected value for this method.
  *
  * The function uses the first lambdas class name to uniquely identify this particular invocation
  * of setBody and associates the body lambda with it through the Mock class bindingHelper. Then
@@ -39,7 +35,7 @@ fun <T, R: T> setReturnValue(func: () -> T, ret: R) = setBody(func, { ret })
  * @param body A lambda which is executed every time the mocked method is called.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T, R: T> setBody(func: () -> T, body: (List<Any>) -> R) {
+fun <T> setBody(func: () -> T, body: (List<Any>) -> T) {
     val key = func.javaClass.name
     Mock.bindingHelper[key] = body as MockBody
     // Call lambda to associate body with mocked method.
