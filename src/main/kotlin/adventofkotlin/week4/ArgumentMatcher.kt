@@ -1,5 +1,8 @@
 package adventofkotlin.week4
 
+/**
+ * Stores mapping from actual values to argument matchers.
+ */
 class ArgumentMatcher {
 
     private val argumentMatchers = mutableMapOf<Any, Matcher>()
@@ -29,18 +32,31 @@ interface Matcher {
 
 }
 
+/**
+ * Matches every possible argument.
+ */
 class AnyMatcher: Matcher {
 
     override fun <T> matches(other: T): Boolean = true
 
 }
 
+/**
+ * Matches if argument compares equal to value.
+ *
+ * @param value Value to compare against.
+ */
 class EqualsMatcher<T>(private val value: T): Matcher {
 
     override fun <T> matches(other: T): Boolean = value == other
 
 }
 
+/**
+ * Matches if argument is same as value.
+ *
+ * @param value Value to compare against.
+ */
 class SameMatcher<T>(private val value: T): Matcher {
 
     override fun <T> matches(other: T): Boolean = value === other
