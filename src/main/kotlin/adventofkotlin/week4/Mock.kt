@@ -65,7 +65,7 @@ inline fun <reified T> mock(): T {
  */
 class Mock: InvocationHandler {
 
-    private val bindings: MutableMap<Method, MockBody> = mutableMapOf()
+    private val mockFunctions: MutableList<MockFunction> = mutableListOf()
 
     /**
      * Handles a method calls for a proxy object.
@@ -95,7 +95,8 @@ class Mock: InvocationHandler {
 
         val argsList: MutableList<Any> = mutableListOf()
         args?.map { argsList.add(it) }
-        return bindings[method]?.invoke(argsList) ?: throw IllegalStateException("No body for mocked method $method set")
+        val mock = mockFunctions.find { it.matches(method, argsList) }
+        return mock?.invoke(argsList) ?: throw IllegalStateException("No body for mocked method $method set")
     }
 
 
@@ -104,11 +105,24 @@ class Mock: InvocationHandler {
         /**
          * Stores all bodies which are currently in process of binding to a mocked method.
          */
-        var bindingHelper: MutableMap<String, MockBody> = mutableMapOf()
+        val bindingHelper: MutableMap<String, MockBody> = mutableMapOf()
+
+        val argumentMatchers: MutableMap<String, ArgumentMatcher> = mutableMapOf()
     }
 
 }
 
-fun <T: Any> any(value: T): T {
-    return value
+class MockFunction(private val method: Method,
+                   private val argumentMatchers: List<Matcher>,
+                   private val body: MockBody
+) {
+
+    fun matches(method: Method, arguments: List<Any>): Boolean {
+        return method == this.method &&
+                argumentMatchers.size == arguments.size &&
+                argumentMatchers.zip(arguments).all { it.first.matches(it.second) }
+    }
+
+    fun invoke(args: List<Any>): Any = body(args)
+
 }
