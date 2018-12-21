@@ -118,11 +118,27 @@ class Mock: InvocationHandler {
 
 }
 
+/**
+ * Stores a mock function body, as well as the method and argument matchers the body is applicable to.
+ *
+ * @param method The method this mock function is valid for.
+ * @param argumentMatchers List of matchers that must be valid for method arguments.
+ * @param body The mock function implementation.
+ */
 class MockFunction(private val method: Method,
                    private val argumentMatchers: List<Matcher>,
                    private val body: MockBody
 ) {
 
+    /**
+     * Checks if this mock function is valid for a method and argument combination.
+     *
+     * For the mock method to be valid, the method must be correct and every argument must match
+     * its associated argument matcher.
+     *
+     * @param method Method to check against.
+     * @param arguments Args the method was called with.
+     */
     fun matches(method: Method, arguments: List<Any>): Boolean {
         return method == this.method &&
                 argumentMatchers.size == arguments.size &&
