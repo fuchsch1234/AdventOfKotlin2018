@@ -17,7 +17,7 @@ typealias MockBody = (List<Any>) -> Any
  * @param func A lambda calling a method of a mock object.
  * @param ret The return value all calls to this method should return.
  */
-fun <T> setReturnValue(func: () -> T, ret: T) = setBody(func, { ret })
+fun <T> setReturnValue(func: ArgumentMatcher.() -> T, ret: T) = setBody(func, { ret })
 
 /**
  * Sets a body for a mocked method.
@@ -35,12 +35,14 @@ fun <T> setReturnValue(func: () -> T, ret: T) = setBody(func, { ret })
  * @param body A lambda which is executed every time the mocked method is called.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T> setBody(func: () -> T, body: (List<Any>) -> T) {
+fun <T> setBody(func: ArgumentMatcher.() -> T, body: (List<Any>) -> T) {
     val key = func.javaClass.name
     Mock.bindingHelper[key] = body as MockBody
+    val argumentMatcher = ArgumentMatcher()
+    Mock.argumentMatchers[key] = argumentMatcher
     // Call lambda to associate body with mocked method.
     try {
-        func()
+        argumentMatcher.func()
     } catch (t: Throwable) {
     } finally {
         // Remove binding to avoid checking it again and again in mock.invoke().
@@ -87,7 +89,11 @@ class Mock: InvocationHandler {
             val key = Throwable().stackTrace.find { bindingHelper.containsKey(it.className) }?.className
             if (key != null) {
                 // Should never fail, because key was checked before using containsKey()
-                bindings[method] = bindingHelper[key] ?: throw IllegalArgumentException("Missing body for $key")
+                val body = bindingHelper[key] ?: throw IllegalArgumentException("Missing body for $key")
+                val argumentMatcher = argumentMatchers[key] ?: throw IllegalArgumentException("Missing argument matchers for $key")
+                val arguments = args?.map { argumentMatcher.getArgumentMatcher(it)}?.toList() ?: emptyList()
+                mockFunctions.add(MockFunction(method, arguments, body)
+                    )
                 // Bail out early to avoid calling the function body.
                 throw Throwable()
             }

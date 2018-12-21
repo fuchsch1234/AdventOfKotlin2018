@@ -32,7 +32,7 @@ class MockUnitTest {
     @Test
     fun `mock works with arguments`() {
         val b = mock<ExampleWithArguments>()
-        setBody({ b.a(1, any("test")) }, { "This is one!" })
+        setBody({ b.a(1, "AAA") }, { "This is one!" })
         setBody({ b.a(any(1), any("test")) }, { (a, str) -> "$a, $str" })
         assertEquals("10, AAA", b.a(10, "AAA"))
         assertEquals("5, AAA", b.a(5, "AAA"))
